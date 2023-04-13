@@ -250,13 +250,13 @@ class Next12Hours {
 
 class Summary {
     Summary({
-        required this.symbolCode,
+       this.symbolCode,
     });
 
-    SymbolCode symbolCode;
+    SymbolCode? symbolCode;
 
     factory Summary.fromJson(Map<String, dynamic> json) => Summary(
-        symbolCode: symbolCodeValues.map[json["symbol_code"]]!,
+        symbolCode: symbolCodeValues.map[json["symbol_code"]],
     );
 
     Map<String, dynamic> toJson() => {
