@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "807368771566",
+    "project_id": "drop-n-go",
+    "storage_bucket": "drop-n-go.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807368771566:android:63db2987b95f9a832bb0ff",
+        "android_client_info": {
+          "package_name": "com.example.drop_n_go"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807368771566-52e8gjr53nbe5l64lejk4g4oeh86qaji.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlDA6e_tymSuGdvSX7aLNth2mdkEzFPQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807368771566-52e8gjr53nbe5l64lejk4g4oeh86qaji.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
