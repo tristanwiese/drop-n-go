@@ -1,13 +1,10 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/views/initializer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../services/utils.dart';
-
-dynamic user = FirebaseAuth.instance.currentUser!;
-dynamic uid = user.uid;
-dynamic email = user.email;
 
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({super.key});
@@ -24,6 +21,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
   void initState(){
     super.initState();
 
+    checkIfDocExists(FirebaseAuth.instance.currentUser!.uid);
 
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     
@@ -100,4 +98,23 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       ),
     );
   
+
+  checkIfDocExists(String docId) async{
+    try {
+      // Get reference to Firestore collection
+      var collectionRef = FirebaseFirestore.instance.collection('users');
+
+
+      var doc = await collectionRef.doc(docId).get();
+      if (doc.exists){
+        return;
+      }
+      else{
+        final user = {'id':docId};   
+        FirebaseFirestore.instance.collection('users').doc(docId).set(user);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

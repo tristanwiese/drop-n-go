@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/Views/home_page.dart';
 import 'package:drop_n_go/models/compact_weather_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/weather.dart';
@@ -82,7 +83,7 @@ class _InitializerState extends State<Initializer> {
   databaseFetch() async {
     favorites = await FirebaseFirestore.instance
         .collection('users')
-        .doc('test')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('favorites')
         .get();
   }

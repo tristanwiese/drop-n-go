@@ -25,12 +25,17 @@ class NearbyPlaces {
         "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=$lat,$lon&radius=$radius&key=AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4";
     var client = http.Client();
       var uri = Uri.parse(url);
+      try{
       var response = await client.get(uri, headers: corsHeaders);
       if (response.statusCode == 200) {
         String json = response.body;
         print(json);
         return nearbyLocationsDataFromJson(json);
       } else {
+        return null;
+      }
+      }catch(e){
+        print(e);
         return null;
       }
   }

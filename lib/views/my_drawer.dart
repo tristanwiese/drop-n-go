@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/Views/initializer.dart';
 import 'package:drop_n_go/services/nav.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'map.dart';
@@ -80,7 +81,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
     await FirebaseFirestore.instance
         .collection('users')
-        .doc('test')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('favorites')
         .doc(id)
         .delete();

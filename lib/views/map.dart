@@ -1,6 +1,7 @@
 import 'package:drop_n_go/models/favorite_locations.dart';
 import 'package:drop_n_go/services/nav.dart';
 import 'package:drop_n_go/views/initializer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -124,7 +125,7 @@ class _MapWidgetState extends State<MapWidget> {
                   lon: widget.lon);
               await FirebaseFirestore.instance
                   .collection('users')
-                  .doc('test')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
                   .collection('favorites')
                   .doc(nameControler.text.trim())
                   .set(fav.toDB());

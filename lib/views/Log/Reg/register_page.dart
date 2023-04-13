@@ -186,7 +186,6 @@ class _RegisterWidgetState extends State<RegisterWidget> {
       barrierDismissible: false,
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
-    print('fired');
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
