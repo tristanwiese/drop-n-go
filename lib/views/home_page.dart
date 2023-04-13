@@ -3,7 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/services/nav.dart';
 import 'package:drop_n_go/Views/my_drawer.dart';
-import 'package:drop_n_go/services/weather_call.dart';
+import 'package:drop_n_go/services/nearby_places.dart';
 import 'package:drop_n_go/views/initializer.dart';
 import 'package:drop_n_go/views/map.dart';
 import 'package:flutter/material.dart';
@@ -40,55 +40,59 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.gps_fixed_outlined)),
       body: Center(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          
           children: [
             MyDrawer(favorites: widget.favorites),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Drop n Go',
-                      style: TextStyle(fontSize: 100),
-                    ),
-                    Icon(
-                      Icons.location_on,
-                      size: 60,
-                    )
-                  ],
-                ),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.green[100],
-                  child: IconButton(
-                    // ignore: avoid_returning_null_for_void
-                    onPressed: (){
-                      navPush(context, MapWidget(lat: widget.currentPosition!.latitude, lon: widget.currentPosition!.longitude));
-                      APICall(lon: widget.currentPosition!.longitude, lat: widget.currentPosition!.latitude).geNearbyPlaces();
-                    },
-                    icon: const Icon(Icons.location_on_outlined),
-                    iconSize: 60,
-                    color: Colors.green,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: SizedBox(
-                    child: Row(
+            Expanded(
+              child: SizedBox(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextCard(text: 'LAT: ${widget.currentPosition!.latitude}'),
-                        const SizedBox(width: 20),
-                        TextCard(text:'LON: ${widget.currentPosition!.longitude}'),
-                        const SizedBox(width: 20),
-                        TextCard(text: 'TEMP C: ${widget.temp}'),
+                      children: const [
+                        Text(
+                          'Drop n Go',
+                          style: TextStyle(fontSize: 100),
+                        ),
+                        Icon(
+                          Icons.location_on,
+                          size: 60,
+                        )
                       ],
                     ),
-                  ),
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.green[100],
+                      child: IconButton(
+                        // ignore: avoid_returning_null_for_void
+                        onPressed: (){
+                          navPush(context, MapWidget(lat: widget.currentPosition!.latitude, lon: widget.currentPosition!.longitude));
+                          NearbyPlaces(lon: widget.currentPosition!.longitude, lat: widget.currentPosition!.latitude, radius: 1000).get();
+                        },
+                        icon: const Icon(Icons.location_on_outlined),
+                        iconSize: 60,
+                        color: Colors.green,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: SizedBox(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextCard(text: 'LAT: ${widget.currentPosition!.latitude}'),
+                            const SizedBox(width: 20),
+                            TextCard(text:'LON: ${widget.currentPosition!.longitude}'),
+                            const SizedBox(width: 20),
+                            TextCard(text: 'TEMP C: ${widget.temp}'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
             Column(),
           ],

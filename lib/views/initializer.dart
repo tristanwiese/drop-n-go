@@ -3,8 +3,8 @@ import 'package:drop_n_go/Views/home_page.dart';
 import 'package:drop_n_go/models/compact_weather_model.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import '../services/weather.dart';
 import '../services/permisions.dart';
-import '../services/weather_call.dart';
 
 class Initializer extends StatefulWidget {
   const Initializer({super.key});
@@ -71,7 +71,7 @@ class _InitializerState extends State<Initializer> {
   }
 
   getWeather() async{
-    await APICall(lon: _currentPosition?.longitude, lat: _currentPosition?.latitude).getWeather().then((data) => {
+    await Weather(lon: _currentPosition?.longitude, lat: _currentPosition?.latitude).get().then((data) => {
       setState(()=> weather = data)
     });
     setState(() {
