@@ -9,6 +9,7 @@ import 'package:drop_n_go/views/map.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/compact_weather_model.dart';
+import '../services/utils.dart';
 
 // ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
@@ -51,13 +52,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Text(
-                          'Drop n Go',
-                          style: TextStyle(fontSize: 100),
-                        ),
+                        Logo(),
                         Icon(
                           Icons.location_on,
                           size: 60,
+                          color: Colors.green,
                         )
                       ],
                     ),
