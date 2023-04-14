@@ -2,8 +2,6 @@
 //
 //     final nearbyLocationsData = nearbyLocationsDataFromJson(jsonString);
 
-// ignore_for_file: constant_identifier_names
-
 import 'dart:convert';
 
 NearbyLocationsData nearbyLocationsDataFromJson(String str) => NearbyLocationsData.fromJson(json.decode(str));
@@ -89,7 +87,7 @@ class Result {
         scope: scopeValues.map[json["scope"]]!,
         types: List<String>.from(json["types"].map((x) => x)),
         vicinity: json["vicinity"],
-        businessStatus: businessStatusValues.map[json["business_status"]]!,
+        //businessStatus: businessStatusValues.map[json["business_status"]]!,
         plusCode: json["plus_code"] == null ? null : PlusCode.fromJson(json["plus_code"]),
         rating: json["rating"]?.toDouble(),
         userRatingsTotal: json["user_ratings_total"],
