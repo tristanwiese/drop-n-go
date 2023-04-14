@@ -80,15 +80,11 @@ class _MapWidgetState extends State<MapWidget> {
       ),
       body: Row(
         children: [
-          Stack(
-            children: [
-              SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: map()),
-              nearbyPlacesDrawer(context),
-            ],
-          )
+          nearbyPlacesDrawer(context),
+          Expanded(
+            child: SizedBox(
+                child: map()),
+          ),
         ],
       ),
     );
@@ -172,8 +168,8 @@ class _MapWidgetState extends State<MapWidget> {
   }
    Widget nearbyPlacesDrawer(BuildContext context) {
     return Container(
+        decoration: BoxDecoration(border: Border.all(width: 2, color: Colors.black), color: Colors.green),
         width: 200,
-        color: Colors.green,
         child: ListView.builder(
           itemCount: widget.places!.results.length,
           itemBuilder: (BuildContext context, index) {
@@ -183,7 +179,7 @@ class _MapWidgetState extends State<MapWidget> {
               title: Text("${index + 1}. ${widget.places!.results[index].name}", style: const TextStyle(color: Colors.white),),
               onTap: () => toggleMapCameraPos(widget.places!.results[index].geometry.location.lat,widget.places!.results[index].geometry.location.lng),
               hoverColor: Colors.black,
-              shape: const StadiumBorder(side: BorderSide(width: 1)),
+              shape: const RoundedRectangleBorder(side: BorderSide(width: 1, color: Colors.black)),
             ),
           );
         }));
