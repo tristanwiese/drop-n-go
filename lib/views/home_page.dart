@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/services/nav.dart';
-import 'package:drop_n_go/Views/my_drawer.dart';
+
 import 'package:drop_n_go/services/nearby_places.dart';
 import 'package:drop_n_go/views/initializer.dart';
 import 'package:drop_n_go/views/map.dart';
@@ -12,6 +12,8 @@ import '../models/compact_weather_model.dart';
 import '../models/nearby_locations_data.dart';
 import '../services/utils.dart';
 import 'package:intl/intl.dart';
+
+import 'my_drawer.dart';
 
 // ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
@@ -58,11 +60,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
-
-
-
-
   Expanded centrColumn(BuildContext context) {
     return Expanded(
       child: SizedBox(
@@ -75,19 +72,20 @@ class _MyHomePageState extends State<MyHomePage> {
               backgroundColor: Colors.green[100],
               child: IconButton(
                 // ignore: avoid_returning_null_for_void
-                onPressed: () async{
+                onPressed: () async {
                   NearbyLocationsData? places = await NearbyPlaces(
                           lon: widget.currentPosition!.longitude,
                           lat: widget.currentPosition!.latitude,
                           radius: 1000)
                       .get();
-                  navPush(context,
-                      MapWidget(
-                          lat: widget.currentPosition!.latitude,
-                          lon: widget.currentPosition!.longitude,
-                          places: places,
-                          ),);
-                  
+                  navPush(
+                    context,
+                    MapWidget(
+                      lat: widget.currentPosition!.latitude,
+                      lon: widget.currentPosition!.longitude,
+                      places: places,
+                    ),
+                  );
                 },
                 icon: const Icon(Icons.location_on_outlined),
                 iconSize: 60,

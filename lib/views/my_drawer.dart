@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/Views/initializer.dart';
 import 'package:drop_n_go/main.dart';
@@ -5,10 +7,12 @@ import 'package:drop_n_go/services/nav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../models/nearby_locations_data.dart';
+import '../services/nearby_places.dart';
 import 'map.dart';
 
 class MyDrawer extends StatefulWidget {
-  const MyDrawer({
+   const MyDrawer({
     super.key,
     required this.favorites,
   });
@@ -63,11 +67,20 @@ class _MyDrawerState extends State<MyDrawer> {
             return Padding(
               padding: const EdgeInsets.all(5.0),
               child: ListTile(
-                onTap: () => navPush(
+                onTap: () async{
+                  NearbyLocationsData? places = await NearbyPlaces(
+                          lon: widget.favorites!.docs[index]['lon'],
+                          lat: widget.favorites!.docs[index]['lat'],
+                          radius: 1000)
+                      .get();
+                  navPush(
                     context,
                     MapWidget(
                         lat: widget.favorites!.docs[index]['lat'],
-                        lon: widget.favorites!.docs[index]['lon'])),
+                        lon: widget.favorites!.docs[index]['lon'],
+                        places: places,
+                        ));
+                },
                 title: Text(widget.favorites!.docs[index]['id']),
                 trailing: IconButton(
                     onPressed: () =>

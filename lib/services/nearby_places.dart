@@ -17,8 +17,6 @@ class NearbyPlaces {
   Future<NearbyLocationsData?> get() async {
     String url =
         "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=$lat,$lon&radius=$radius&key=AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4";
-    // var client = http.Client();
-    // var uri = Uri.parse(url);
     
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
