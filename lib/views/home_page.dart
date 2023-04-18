@@ -36,13 +36,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   String formattedDate = DateFormat('dd/M/yyyy').format(DateTime.now());
   String formattedTime = DateFormat('kk:mm:ss').format(DateTime.now());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const AppBarLogo()),
+      drawer: SafeArea(
+        child: Drawer(
+          width: 100,
+          child: MyDrawer(favorites: widget.favorites),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
             navReplace(context, const Initializer());
@@ -51,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Row(
           children: [
-            MyDrawer(favorites: widget.favorites),
+            //MyDrawer(favorites: widget.favorites),
             centrColumn(context),
             const RightGap(),
           ],
@@ -64,20 +70,27 @@ class _MyHomePageState extends State<MyHomePage> {
     return Expanded(
       child: SizedBox(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Logo(),
+            // const Logo(),
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.green[100],
               child: IconButton(
                 // ignore: avoid_returning_null_for_void
                 onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) =>
+                        const Center(child: CircularProgressIndicator()),
+                  );
                   NearbyLocationsData? places = await NearbyPlaces(
                           lon: widget.currentPosition!.longitude,
                           lat: widget.currentPosition!.latitude,
                           radius: 1000)
                       .get();
+                      navPop(context);
                   navPush(
                     context,
                     MapWidget(
@@ -92,25 +105,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.green,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: SizedBox(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextCard(text: 'LAT: ${widget.currentPosition?.latitude}'),
-                    const SizedBox(width: 20),
-                    TextCard(text: 'LON: ${widget.currentPosition?.longitude}'),
-                    const SizedBox(width: 20),
-                    TextCard(text: 'TEMP C: ${widget.temp}'),
-                    const SizedBox(width: 20),
-                    TextCard(text: 'DATE: $formattedDate'),
-                    const SizedBox(width: 20),
-                    TextCard(text: 'TIME: $formattedTime')
-                  ],
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(5.0),
+            //   child: SizedBox(
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         TextCard(text: 'LAT: ${widget.currentPosition?.latitude}'),
+            //         const SizedBox(width: 20),
+            //         TextCard(text: 'LON: ${widget.currentPosition?.longitude}'),
+            //         const SizedBox(width: 20),
+            //         TextCard(text: 'TEMP C: ${widget.temp}'),
+            //         const SizedBox(width: 20),
+            //         TextCard(text: 'DATE: $formattedDate'),
+            //         const SizedBox(width: 20),
+            //         TextCard(text: 'TIME: $formattedTime')
+            //       ],
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

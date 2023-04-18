@@ -8,7 +8,7 @@ class NearbyPlaces {
     'Access-Control-Allow-Origin': '*',
   };
 
-  double radius;
+  int radius;
   double lat;
   double lon;
 
@@ -21,7 +21,7 @@ class NearbyPlaces {
       var response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         String json = response.body;
-        // print(json);
+        print("Radius = $url");
         return nearbyLocationsDataFromJson(json);
       } else {
         return null;

@@ -16,8 +16,8 @@ class NearbyLocationsData {
         required this.status,
     });
 
-    List<dynamic> htmlAttributions;
-    String nextPageToken;
+    List<dynamic>? htmlAttributions;
+    String? nextPageToken;
     List<Result> results;
     String status;
 
@@ -29,7 +29,7 @@ class NearbyLocationsData {
     );
 
     Map<String, dynamic> toJson() => {
-        "html_attributions": List<dynamic>.from(htmlAttributions.map((x) => x)),
+        "html_attributions": List<dynamic>.from(htmlAttributions!.map((x) => x)),
         "next_page_token": nextPageToken,
         "results": List<dynamic>.from(results.map((x) => x.toJson())),
         "status": status,
