@@ -35,7 +35,6 @@ class _MapWidgetState extends State<MapWidget> {
 
   String viewType = 'Satellite';
   MapType mapType = MapType.normal;
-  bool showDrawer = false;
   Set<Circle> _circle = Set<Circle>();
   double searchRadius = 1000;
   Timer? _debounce;
@@ -91,13 +90,10 @@ class _MapWidgetState extends State<MapWidget> {
             margin: const EdgeInsets.only(bottom: 20),
             child: FloatingActionButton(
               onPressed: () {
-                setState(() {
-                  showDrawer = !showDrawer;
-                });
-                // showDialog(
-                //   context: context,
-                //   builder: locationName,
-                // );
+                showDialog(
+                  context: context,
+                  builder: locationName,
+                );
               },
               child: const Icon(Icons.star_border_outlined),
             )),
@@ -326,7 +322,6 @@ class _MapWidgetState extends State<MapWidget> {
                   .collection('favorites')
                   .doc(nameControler.text.trim())
                   .set(fav.toDB());
-              // ignore: use_build_context_synchronously
               navReplace(context, const Initializer());
             },
             child: const Text('Save')));

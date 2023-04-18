@@ -12,7 +12,7 @@ import '../services/nearby_places.dart';
 import 'map.dart';
 
 class MyDrawer extends StatefulWidget {
-   const MyDrawer({
+  const MyDrawer({
     super.key,
     required this.favorites,
   });
@@ -42,17 +42,12 @@ class _MyDrawerState extends State<MyDrawer> {
     );
   }
 
-
-
-
-
   IconButton favoriteButton() {
     return IconButton(
-          icon: const Icon(Icons.star_border),
-          iconSize: 40,
-          color: Colors.white,
-          onPressed: () => showFavoritepage()
-        );
+        icon: const Icon(Icons.star_border),
+        iconSize: 40,
+        color: Colors.white,
+        onPressed: () => showFavoritepage());
   }
 
   Widget favoritePage(BuildContext context) {
@@ -67,19 +62,26 @@ class _MyDrawerState extends State<MyDrawer> {
             return Padding(
               padding: const EdgeInsets.all(5.0),
               child: ListTile(
-                onTap: () async{
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) =>
+                        const Center(child: CircularProgressIndicator()),
+                  );
                   NearbyLocationsData? places = await NearbyPlaces(
                           lon: widget.favorites!.docs[index]['lon'],
                           lat: widget.favorites!.docs[index]['lat'],
                           radius: 1000)
                       .get();
+                  navPop(context);
                   navPush(
-                    context,
-                    MapWidget(
+                      context,
+                      MapWidget(
                         lat: widget.favorites!.docs[index]['lat'],
                         lon: widget.favorites!.docs[index]['lon'],
                         places: places,
-                        ));
+                      ));
                 },
                 title: Text(widget.favorites!.docs[index]['id']),
                 trailing: IconButton(
@@ -117,13 +119,13 @@ class _MyDrawerState extends State<MyDrawer> {
     navReplace(context, const Initializer());
   }
 
-  showFavoritepage(){
+  showFavoritepage() {
     return showDialog(
-              context: context,
+      context: context,
       builder: (BuildContext context) {
-                return favoritePage(context);
-              },
-            );
+        return favoritePage(context);
+      },
+    );
   }
 }
 

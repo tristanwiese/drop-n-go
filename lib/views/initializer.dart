@@ -18,10 +18,8 @@ class Initializer extends StatefulWidget {
 class _InitializerState extends State<Initializer> {
   static QuerySnapshot<Map<String, dynamic>>? favorites;
   Position? _currentPosition;
-  CompactWeatherData? weather;
-  double? temp;
   bool initialized = false;
-  var dateTime = DateTime.now();
+  
 
   @override
   void initState() {
@@ -32,7 +30,6 @@ class _InitializerState extends State<Initializer> {
 
   initialize() async {
     await getCurrentPosition();
-    getWeather();
     await databaseFetch();
 
     setState(() {
@@ -49,8 +46,6 @@ class _InitializerState extends State<Initializer> {
         child: MyHomePage(
           title: 'Drop n Go',
           currentPosition: _currentPosition,
-          temp: temp,
-          weather: weather,
           favorites: favorites,
         ),
       ),
@@ -84,17 +79,6 @@ class _InitializerState extends State<Initializer> {
       setState(() => _currentPosition = position);
     }).catchError((e) {
       debugPrint(e);
-    });
-  }
-
-  getWeather() async {
-    await Weather(
-            lon: _currentPosition?.longitude, lat: _currentPosition?.latitude)
-        .get()
-        .then((data) => {setState(() => weather = data)});
-    setState(() {
-      temp =
-          weather!.properties.timeseries[1].data.instant.details.airTemperature;
     });
   }
 

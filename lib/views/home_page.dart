@@ -21,8 +21,6 @@ class MyHomePage extends StatefulWidget {
     super.key,
     required this.title,
     required this.currentPosition,
-    required this.weather,
-    required this.temp,
     required this.favorites,
   });
   QuerySnapshot<Map<String, dynamic>>? favorites;
