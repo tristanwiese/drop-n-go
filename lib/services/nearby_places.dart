@@ -27,4 +27,17 @@ class NearbyPlaces {
         return null;
       }
   }
+  Future<NearbyLocationsData?> getMore(token) async {
+    String url =
+        "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&pagetoken=$token&key=AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4";
+    
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        String json = response.body;
+        print("Radius = $url");
+        return nearbyLocationsDataFromJson(json);
+      } else {
+        return null;
+      }
+  }
 }

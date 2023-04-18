@@ -204,6 +204,95 @@ class _MapWidgetState extends State<MapWidget> {
     ]);
   }
 
+  Widget nearbyPlacesDrawer(BuildContext ctx) {
+    return isLoaded
+        ? ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: searchResults!.results.length,
+            itemBuilder: (BuildContext context, index) {
+              if (index == searchResults!.results.length - 1 &&
+                  searchResults!.nextPageToken != null) {
+                return Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () => toggleMapCameraPos(
+                            searchResults!.results[index].geometry.location.lat,
+                            searchResults!
+                                .results[index].geometry.location.lng),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border.all(),
+                              color: Colors.green.withOpacity(0.5)),
+                          width: 150,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(
+                                  "${index + 1}: ${searchResults!.results[index].name}",
+                                  textAlign: TextAlign.center),
+                              Text(
+                                "Type: ${StringExtension(string: searchResults!.results[index].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[index].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
+                                textAlign: TextAlign.center,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_right_alt_rounded),
+                        onPressed: () async {
+                          setState(() {
+                            isLoaded = false;
+                          });
+                          showDialog(
+                            context: ctx,
+                            barrierDismissible: false,
+                            builder: (ctx) => const Center(
+                                child: CircularProgressIndicator()),
+                          );
+                          searchResults = await NearbyPlaces(lat: widget.lat, lon: widget.lon, radius: searchRadius.toInt()).getMore(searchResults!.nextPageToken);
+                          setState(() {
+                            isLoaded = true;
+                          });
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: InkWell(
+                      onTap: () => toggleMapCameraPos(
+                          searchResults!.results[index].geometry.location.lat,
+                          searchResults!.results[index].geometry.location.lng),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(),
+                            color: Colors.green.withOpacity(0.5)),
+                        width: 150,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                                "${index + 1}: ${searchResults!.results[index].name}",
+                                textAlign: TextAlign.center),
+                            Text(
+                              "Type: ${StringExtension(string: searchResults!.results[index].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[index].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
+                              textAlign: TextAlign.center,
+                            )
+                          ],
+                        ),
+                      ),
+                    ));
+              }
+            })
+        : Container();
+  }
+
   Widget locationName(BuildContext context) {
     final TextEditingController nameControler = TextEditingController();
 
@@ -246,54 +335,5 @@ class _MapWidgetState extends State<MapWidget> {
       content: const Text('Enter Location Name'),
       actions: [name, saveButton],
     );
-  }
-
-  Widget nearbyPlacesDrawer(BuildContext context) {
-    return isLoaded
-        ? ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: searchResults!.results.length,
-            itemBuilder: (BuildContext context, index) {
-              if (index == searchResults!.results.length - 1) {
-                return Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Container(
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_right_alt_rounded),
-                      onPressed: () {
-                        
-                      },
-                    ),
-                  ),
-                );
-              } else {
-                return Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: InkWell(
-                      onTap: () => toggleMapCameraPos(
-                          searchResults!.results[index].geometry.location.lat,
-                          searchResults!.results[index].geometry.location.lng),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(),
-                            color: Colors.green.withOpacity(0.5)),
-                        width: 150,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                                "${index + 1}: ${searchResults!.results[index].name}",
-                                textAlign: TextAlign.center),
-                            Text(
-                              "Type: ${StringExtension(string: searchResults!.results[index].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[index].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
-                              textAlign: TextAlign.center,
-                            )
-                          ],
-                        ),
-                      ),
-                    ));
-              }
-            })
-        : Container();
   }
 }
