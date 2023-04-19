@@ -35,7 +35,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   String viewType = 'Satellite';
   MapType mapType = MapType.normal;
-  Set<Circle> _circle = Set<Circle>();
+  final Set<Circle> _circle = <Circle>{};
   double searchRadius = 1000;
   Timer? _debounce;
   NearbyLocationsData? searchResults;
@@ -191,7 +191,7 @@ class _MapWidgetState extends State<MapWidget> {
       ),
       Positioned(
         bottom: 80,
-        child: Container(
+        child: SizedBox(
           height: 150,
           width: MediaQuery.of(context).size.width,
           child: nearbyPlacesDrawer(context),

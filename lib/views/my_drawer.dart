@@ -115,7 +115,6 @@ class _MyDrawerState extends State<MyDrawer> {
         .doc(id)
         .delete();
 
-    // ignore: use_build_context_synchronously
     navReplace(context, const Initializer());
   }
 

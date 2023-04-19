@@ -29,6 +29,13 @@
             {
               "client_id": "807368771566-52e8gjr53nbe5l64lejk4g4oeh86qaji.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "807368771566-aocar351grhf0tgem7flkvok4jmb46q3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.dropNGo"
+              }
             }
           ]
         }
