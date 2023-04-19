@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:drop_n_go/services/nav.dart';
 
 import 'package:drop_n_go/services/nearby_places.dart';
+import 'package:drop_n_go/test.dart';
 import 'package:drop_n_go/views/initializer.dart';
 import 'package:drop_n_go/views/map.dart';
 import 'package:flutter/material.dart';
@@ -97,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       places: places,
                     ),
                   );
+                  TestData(data: places);
                 },
                 icon: const Icon(Icons.location_on_outlined),
                 iconSize: 60,

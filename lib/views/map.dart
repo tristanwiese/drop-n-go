@@ -89,12 +89,34 @@ class _MapWidgetState extends State<MapWidget> {
         floatingActionButton: Container(
             margin: const EdgeInsets.only(bottom: 20),
             child: FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: locationName,
-                );
-              },
+              onPressed: () async {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) =>
+                    const Center(child: CircularProgressIndicator()),
+              );
+              late int count;
+              await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get().then((value) {
+                count = value.data()!['count'];
+              },);
+              FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({"count":count + 1});
+              final fav = Favorite(
+                id: "Location#$count",
+                area: searchResults!.results[0].name,
+                lat: widget.lat,
+                lon: widget.lon,
+                date: DateFormat('dd/M/yyyy').format(DateTime.now()),
+                time: DateFormat('kk:mm:ss').format(DateTime.now()),
+              );
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection('favorites')
+                  .doc('Location#$count')
+                  .set(fav.toDB());
+              navReplace(context, const Initializer());
+            },
               child: const Icon(Icons.star_border_outlined),
             )),
         floatingActionButtonLocation:
@@ -310,7 +332,8 @@ class _MapWidgetState extends State<MapWidget> {
                     const Center(child: CircularProgressIndicator()),
               );
               final fav = Favorite(
-                id: nameControler.text.trim(),
+                id: '',
+                area: searchResults!.results[1].name,
                 lat: widget.lat,
                 lon: widget.lon,
                 date: DateFormat('dd/M/yyyy').format(DateTime.now()),

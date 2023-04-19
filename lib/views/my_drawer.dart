@@ -59,9 +59,10 @@ class _MyDrawerState extends State<MyDrawer> {
         child: ListView.builder(
           itemCount: widget.favorites!.docs.length,
           itemBuilder: (BuildContext context, index) {
+            if(widget.favorites!.docs.isNotEmpty){
             return Padding(
               padding: const EdgeInsets.all(5.0),
-              child: ListTile(
+              child: InkWell(
                 onTap: () async {
                   showDialog(
                     context: context,
@@ -83,19 +84,39 @@ class _MyDrawerState extends State<MyDrawer> {
                         places: places,
                       ));
                 },
-                title: Text(widget.favorites!.docs[index]['id']),
-                trailing: IconButton(
-                    onPressed: () =>
-                        deleteFav(widget.favorites!.docs[index]['id']),
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
-                    )),
-                hoverColor: Colors.lightGreen[300],
-                shape: const StadiumBorder(side: BorderSide(width: 1)),
+                child:Container(
+                  decoration: BoxDecoration(border: Border.all(), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            Text(widget.favorites!.docs[index]['id']),
+                            Text(widget.favorites!.docs[index]['area']),
+                            Text('Date: ${widget.favorites!.docs[index]['date']}'),
+                            Text('Time: ${widget.favorites!.docs[index]['time']}')
+                          ],
+                          ),
+                        IconButton(
+                        onPressed: () =>
+                            deleteFav(widget.favorites!.docs[index]['id']),
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        )),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             );
-          },
+          }
+          else{
+            return const Center(child: Text('No favorites'),);
+          }
+          }
         ),
       ),
     );

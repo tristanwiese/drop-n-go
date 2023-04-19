@@ -4,8 +4,10 @@ class Favorite{
   final double lon;
   final String date;
   final String time;
+  final String area;
 
   Favorite({
+    required this.area,
     required this.id,
     required this.lat,
     required this.lon,
@@ -20,6 +22,7 @@ class Favorite{
   "lon":lon,
   "date":date,
   "time":time,
+  "area":area
   };
  }
 }

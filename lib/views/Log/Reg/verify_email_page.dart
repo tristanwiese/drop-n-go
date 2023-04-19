@@ -110,7 +110,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
         return;
       }
       else{
-        final user = {'id':docId};   
+        final user = {'id':docId, 'count':'1'};   
         FirebaseFirestore.instance.collection('users').doc(docId).set(user);
       }
     } catch (e) {
