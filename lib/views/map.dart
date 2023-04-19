@@ -41,6 +41,10 @@ class _MapWidgetState extends State<MapWidget> {
   NearbyLocationsData? searchResults;
   bool isLoaded = false;
 
+  List results =[];
+
+  String filterValue = '';
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     setCircle();
@@ -48,6 +52,14 @@ class _MapWidgetState extends State<MapWidget> {
     setState(() {
       isLoaded = true;
     });
+  }
+
+  filter(){
+    for (var i = 0; i < searchResults!.results.length; i++){
+      if (searchResults!.results[i].types.contains(filterValue)){
+        results.add(i);
+      }
+    }
   }
 
   setCircle() {
@@ -86,41 +98,41 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            child: FloatingActionButton(
-              onPressed: () async {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) =>
-                    const Center(child: CircularProgressIndicator()),
-              );
-              late int count;
-              await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get().then((value) {
-                count = value.data()!['count'];
-              },);
-              FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({"count":count + 1});
-              final fav = Favorite(
-                id: "Location#$count",
-                area: searchResults!.results[0].name,
-                lat: widget.lat,
-                lon: widget.lon,
-                date: DateFormat('dd/M/yyyy').format(DateTime.now()),
-                time: DateFormat('kk:mm:ss').format(DateTime.now()),
-              );
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .collection('favorites')
-                  .doc('Location#$count')
-                  .set(fav.toDB());
-              navReplace(context, const Initializer());
-            },
-              child: const Icon(Icons.star_border_outlined),
-            )),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.miniCenterDocked,
+        // floatingActionButton: Container(
+        //     margin: const EdgeInsets.only(bottom: 20),
+        //     child: FloatingActionButton(
+        //       onPressed: () async {
+        //       showDialog(
+        //         context: context,
+        //         barrierDismissible: false,
+        //         builder: (context) =>
+        //             const Center(child: CircularProgressIndicator()),
+        //       );
+        //       late int count;
+        //       await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get().then((value) {
+        //         count = value.data()!['count'];
+        //       },);
+        //       FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({"count":count + 1});
+        //       final fav = Favorite(
+        //         id: "Location#$count",
+        //         area: searchResults!.results[0].name,
+        //         lat: widget.lat,
+        //         lon: widget.lon,
+        //         date: DateFormat('dd/M/yyyy').format(DateTime.now()),
+        //         time: DateFormat('kk:mm:ss').format(DateTime.now()),
+        //       );
+        //       await FirebaseFirestore.instance
+        //           .collection('users')
+        //           .doc(FirebaseAuth.instance.currentUser!.uid)
+        //           .collection('favorites')
+        //           .doc('Location#$count')
+        //           .set(fav.toDB());
+        //       navReplace(context, const Initializer());
+        //     },
+        //       child: const Icon(Icons.star_border_outlined),
+        //     )),
+        // floatingActionButtonLocation:
+        //     FloatingActionButtonLocation.miniCenterDocked,
         appBar: AppBar(
           title: const Center(child: Text('Map')),
           elevation: 2,
@@ -218,7 +230,30 @@ class _MapWidgetState extends State<MapWidget> {
           width: MediaQuery.of(context).size.width,
           child: nearbyPlacesDrawer(context),
         ),
-      )
+      ),
+      Positioned(
+        bottom: 20,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                child: IconButton(
+                  onPressed: (){},
+                  icon:const Icon(Icons.filter_alt_outlined) 
+                  ),
+              ),
+              const SizedBox(width: 30),
+              CircleAvatar(
+                child: IconButton(
+                  onPressed: (){},
+                  icon: const Icon(Icons.star),
+                ),
+              )
+            ],
+          ),
+        ),)
     ]);
   }
 
@@ -226,9 +261,9 @@ class _MapWidgetState extends State<MapWidget> {
     return isLoaded
         ? ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: searchResults!.results.length,
+            itemCount: results.length,
             itemBuilder: (BuildContext context, index) {
-              if (index == searchResults!.results.length - 1 &&
+              if (results[index] == results.length - 1 &&
                   searchResults!.nextPageToken != null) {
                 return Padding(
                   padding: const EdgeInsets.all(5),
@@ -236,9 +271,9 @@ class _MapWidgetState extends State<MapWidget> {
                     children: [
                       InkWell(
                         onTap: () => toggleMapCameraPos(
-                            searchResults!.results[index].geometry.location.lat,
+                            searchResults!.results[results[index]].geometry.location.lat,
                             searchResults!
-                                .results[index].geometry.location.lng),
+                                .results[results[index]].geometry.location.lng),
                         child: Container(
                           decoration: BoxDecoration(
                               border: Border.all(),
@@ -248,10 +283,10 @@ class _MapWidgetState extends State<MapWidget> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(
-                                  "${index + 1}: ${searchResults!.results[index].name}",
+                                  "${searchResults!.results[results[index]].name}",
                                   textAlign: TextAlign.center),
                               Text(
-                                "Type: ${StringExtension(string: searchResults!.results[index].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[index].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
+                                "Type: ${StringExtension(string: searchResults!.results[results[index]].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[results[index]].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
                                 textAlign: TextAlign.center,
                               )
                             ],
@@ -285,8 +320,8 @@ class _MapWidgetState extends State<MapWidget> {
                     padding: const EdgeInsets.all(5.0),
                     child: InkWell(
                       onTap: () => toggleMapCameraPos(
-                          searchResults!.results[index].geometry.location.lat,
-                          searchResults!.results[index].geometry.location.lng),
+                          searchResults!.results[results[index]].geometry.location.lat,
+                          searchResults!.results[results[index]].geometry.location.lng),
                       child: Container(
                         decoration: BoxDecoration(
                             border: Border.all(),
@@ -296,10 +331,10 @@ class _MapWidgetState extends State<MapWidget> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text(
-                                "${index + 1}: ${searchResults!.results[index].name}",
+                                "${results[index] + 1}: ${searchResults!.results[results[index]].name}",
                                 textAlign: TextAlign.center),
                             Text(
-                              "Type: ${StringExtension(string: searchResults!.results[index].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[index].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
+                              "Type: ${StringExtension(string: searchResults!.results[results[index]].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[results[index]].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
                               textAlign: TextAlign.center,
                             )
                           ],
