@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
+// ignore_for_file: avoid_print, use_build_context_synchronously, constant_identifier_names
 
 import 'package:drop_n_go/models/favorite_locations.dart';
 import 'package:drop_n_go/services/nav.dart';
@@ -30,12 +30,19 @@ class MapWidget extends StatefulWidget {
   State<MapWidget> createState() => _MapWidgetState();
 }
 
-enum Filters {
-  None,
-  Restaurants,
-}
+enum Filters { Restaurants, Lodging, Health, Park }
+
+const List<Text> filterTypes = <Text>[
+  Text('Restaurant'),
+  Text('Lodging'),
+  Text('Health'),
+  Text('Park')
+];
 
 class _MapWidgetState extends State<MapWidget> {
+  //radio buttons
+  final List<bool> _selectedFilters = <bool>[false, false, false, false];
+
   static late GoogleMapController mapController;
 
   String viewType = 'Satellite';
@@ -46,9 +53,10 @@ class _MapWidgetState extends State<MapWidget> {
   NearbyLocationsData? searchResults;
   bool isLoaded = false;
 
-  List results = [];
-
-  Filters? _filterValue;
+  //filter indexes
+  List? indexes = [];
+  bool filterActive = false;
+  List<String?> filters = [];
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -92,44 +100,70 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
+  basicFilter(List<String?> filters) {
+    List index = [];
+    for (var j = 0; j < filters.length; j++) {
+      for (var i = 0; i < searchResults!.results.length; i++) {
+        if (searchResults!.results[i].types.contains(filters[j])) {
+          if (!index.contains(i)) {
+            index.add(i);
+          }
+        }
+      }
+    }
+    print(index);
+    setState(() {
+      indexes = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // floatingActionButton: Container(
-        //     margin: const EdgeInsets.only(bottom: 20),
-        //     child: FloatingActionButton(
-        //       onPressed: () async {
-        //       showDialog(
-        //         context: context,
-        //         barrierDismissible: false,
-        //         builder: (context) =>
-        //             const Center(child: CircularProgressIndicator()),
-        //       );
-        //       late int count;
-        //       await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get().then((value) {
-        //         count = value.data()!['count'];
-        //       },);
-        //       FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).update({"count":count + 1});
-        //       final fav = Favorite(
-        //         id: "Location#$count",
-        //         area: searchResults!.results[0].name,
-        //         lat: widget.lat,
-        //         lon: widget.lon,
-        //         date: DateFormat('dd/M/yyyy').format(DateTime.now()),
-        //         time: DateFormat('kk:mm:ss').format(DateTime.now()),
-        //       );
-        //       await FirebaseFirestore.instance
-        //           .collection('users')
-        //           .doc(FirebaseAuth.instance.currentUser!.uid)
-        //           .collection('favorites')
-        //           .doc('Location#$count')
-        //           .set(fav.toDB());
-        //       navReplace(context, const Initializer());
-        //     },
-        //       child: const Icon(Icons.star_border_outlined),
-        //     )),
-        // floatingActionButtonLocation:
-        //     FloatingActionButtonLocation.miniCenterDocked,
+        floatingActionButton: Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            child: FloatingActionButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+                late int count;
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .get()
+                    .then(
+                  (value) {
+                    count = value.data()!['count'];
+                  },
+                );
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .update({"count": count + 1});
+                final fav = Favorite(
+                  id: "Location#$count",
+                  area: searchResults!.results[0].name,
+                  lat: widget.lat,
+                  lon: widget.lon,
+                  date: DateFormat('dd/M/yyyy').format(DateTime.now()),
+                  time: DateFormat('kk:mm:ss').format(DateTime.now()),
+                );
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .collection('favorites')
+                    .doc('Location#$count')
+                    .set(fav.toDB());
+                navReplace(context, const Initializer());
+              },
+              child: const Icon(Icons.star_border_outlined),
+            )),
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniCenterDocked,
         appBar: AppBar(
           title: const Center(child: Text('Map')),
           elevation: 2,
@@ -209,6 +243,11 @@ class _MapWidgetState extends State<MapWidget> {
                             lon: widget.lon,
                             radius: searchRadius.toInt())
                         .get();
+                    if (filterActive) {
+                      setState(() {
+                        basicFilter(filters);
+                      });
+                    }
                     navPop(context);
                     setState(() {
                       isLoaded = true;
@@ -221,221 +260,196 @@ class _MapWidgetState extends State<MapWidget> {
         ),
       ),
       Positioned(
+        top: 70,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Center(
+            child: ToggleButtons(
+                onPressed: (index) {
+                  setState(() {
+                    _selectedFilters[index] = !_selectedFilters[index];
+                    if (_selectedFilters.contains(true)) {
+                      setState(() {
+                        filterActive = true;
+                      });
+                    } else {
+                      setState(() {
+                        filterActive = false;
+                      });
+                    }
+                    if (!_selectedFilters[index]) {
+                      filters.remove(filterTypes[index].data!.toLowerCase());
+                      basicFilter(filters);
+                      print(filters);
+                    } else {
+                      filters.add(filterTypes[index].data!.toLowerCase());
+                      print(filters);
+                      basicFilter(filters);
+                    }
+                  });
+                },
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                selectedBorderColor: Colors.black,
+                selectedColor: Colors.white,
+                fillColor: Colors.green[200],
+                color: Colors.green[400],
+                constraints:
+                    const BoxConstraints(minHeight: 40.0, minWidth: 80),
+                direction: Axis.horizontal,
+                isSelected: _selectedFilters,
+                children: filterTypes),
+          ),
+        ),
+      ),
+      Positioned(
         bottom: 80,
         child: SizedBox(
           height: 150,
           width: MediaQuery.of(context).size.width,
-          child: nearbyPlacesDrawer(context),
+          child: nearbyPlacesDrawer(),
         ),
       ),
-      Positioned(
-        bottom: 20,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                child: IconButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context, builder: (context) => filterPage());
-                    },
-                    icon: const Icon(Icons.filter_alt_outlined)),
-              ),
-              const SizedBox(width: 30),
-              CircleAvatar(
-                child: IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.star),
-                ),
-              )
-            ],
-          ),
-        ),
-      )
     ]);
   }
 
-  Widget nearbyPlacesDrawer(BuildContext ctx) {
+  nearbyPlacesDrawer() {
     return isLoaded
-        ? ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: results.length,
-            itemBuilder: (BuildContext context, index) {
-              if (results[index] == results.length - 1 &&
-                  searchResults!.nextPageToken != null) {
-                return Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Row(
-                    children: [
-                      InkWell(
-                        onTap: () => toggleMapCameraPos(
-                            searchResults!
-                                .results[results[index]].geometry.location.lat,
-                            searchResults!
-                                .results[results[index]].geometry.location.lng),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              border: Border.all(),
-                              color: Colors.green.withOpacity(0.5)),
-                          width: 150,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                  "${searchResults!.results[results[index]].name}",
-                                  textAlign: TextAlign.center),
-                              Text(
-                                "Type: ${StringExtension(string: searchResults!.results[results[index]].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[results[index]].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
-                                textAlign: TextAlign.center,
-                              )
-                            ],
+        ? filterActive
+            ? indexes!.isNotEmpty
+                ? ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: indexes!.length,
+                    itemBuilder: (BuildContext context, index) {
+                      return myListBuilder(indexes![index], index, indexes);
+                    })
+                : searchResults!.htmlAttributions != null
+                    ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('No results for filters on this page',
+                              style: TextStyle(fontSize: 20)),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_right_alt_rounded),
+                            onPressed: () async {
+                              setState(() {
+                                isLoaded = false;
+                              });
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (ctx) => const Center(
+                                    child: CircularProgressIndicator()),
+                              );
+                              searchResults = await NearbyPlaces(
+                                      lat: widget.lat,
+                                      lon: widget.lon,
+                                      radius: searchRadius.toInt())
+                                  .getMore(searchResults!.nextPageToken);
+                              if (filterActive) {
+                                basicFilter(filters);
+                              }
+                              setState(() {
+                                isLoaded = true;
+                              });
+                              Navigator.pop(context);
+                            },
                           ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.arrow_right_alt_rounded),
-                        onPressed: () async {
-                          setState(() {
-                            isLoaded = false;
-                          });
-                          showDialog(
-                            context: ctx,
-                            barrierDismissible: false,
-                            builder: (ctx) => const Center(
-                                child: CircularProgressIndicator()),
-                          );
-                          searchResults = await NearbyPlaces(
-                                  lat: widget.lat,
-                                  lon: widget.lon,
-                                  radius: searchRadius.toInt())
-                              .getMore(searchResults!.nextPageToken);
-                          setState(() {
-                            isLoaded = true;
-                          });
-                          Navigator.pop(ctx);
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: InkWell(
-                      onTap: () => toggleMapCameraPos(
-                          searchResults!
-                              .results[results[index]].geometry.location.lat,
-                          searchResults!
-                              .results[results[index]].geometry.location.lng),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(),
-                            color: Colors.green.withOpacity(0.5)),
-                        width: 150,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                                "${results[index] + 1}: ${searchResults!.results[results[index]].name}",
-                                textAlign: TextAlign.center),
-                            Text(
-                              "Type: ${StringExtension(string: searchResults!.results[results[index]].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[results[index]].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
-                              textAlign: TextAlign.center,
-                            )
-                          ],
-                        ),
-                      ),
-                    ));
-              }
-            })
+                        ],
+                      )
+                    : const Center(
+                        child: Text('No results for filters on this page',
+                            style: TextStyle(fontSize: 20)),
+                      )
+            : ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: searchResults!.results.length,
+                itemBuilder: (BuildContext context, index) {
+                  return myListBuilder(index, index, searchResults!.results);
+                })
         : Container();
   }
 
-  Widget locationName(BuildContext context) {
-    final TextEditingController nameControler = TextEditingController();
-
-    final name = Container(
-      margin: const EdgeInsets.all(10),
-      child: TextFormField(
-        decoration: const InputDecoration(hintText: 'Location Name'),
-        controller: nameControler,
-      ),
-    );
-
-    final saveButton = Center(
-        child: ElevatedButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) =>
-                    const Center(child: CircularProgressIndicator()),
-              );
-              final fav = Favorite(
-                id: '',
-                area: searchResults!.results[1].name,
-                lat: widget.lat,
-                lon: widget.lon,
-                date: DateFormat('dd/M/yyyy').format(DateTime.now()),
-                time: DateFormat('kk:mm:ss').format(DateTime.now()),
-              );
-              await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .collection('favorites')
-                  .doc(nameControler.text.trim())
-                  .set(fav.toDB());
-              navReplace(context, const Initializer());
-            },
-            child: const Text('Save')));
-
-    return AlertDialog(
-      content: const Text('Enter Location Name'),
-      actions: [name, saveButton],
-    );
-  }
-
-  filterPage() {
-    final title = Text('Filters');
-
-    final body = Center(
-      child: Column(
-        children: [
-          RadioListTile(
-            title: Text(Filters.None.name),
-            value: Filters.None,
-            groupValue: _filterValue,
-            onChanged: (value) {
-              setState(() {
-                _filterValue = value;
-                print(_filterValue);
-                navPop(context);
-              });
-            },
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          RadioListTile(
-            title: Text(Filters.Restaurants.name),
-            value: Filters.Restaurants,
-            groupValue: _filterValue,
-            onChanged: (value) {
-              setState(() {
-                _filterValue = value;
-                navPop(context);
-              });
-            },
-          ),
-        ],
-      ),
-    );
-
-    return AlertDialog(
-      title: title,
-      actions: [body],
-    );
+  Padding myListBuilder(int filterIndex, listTileIndex, end) {
+    if (listTileIndex == end.length - 1 &&
+        searchResults!.nextPageToken != null) {
+      return Padding(
+        padding: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            InkWell(
+              onTap: () => toggleMapCameraPos(
+                  searchResults!.results[filterIndex].geometry.location.lat,
+                  searchResults!.results[filterIndex].geometry.location.lng),
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(), color: Colors.green.withOpacity(0.5)),
+                width: 150,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(searchResults!.results[filterIndex].name,
+                        textAlign: TextAlign.center),
+                    Text(
+                      "Type: ${StringExtension(string: searchResults!.results[filterIndex].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[filterIndex].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
+                      textAlign: TextAlign.center,
+                    )
+                  ],
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_right_alt_rounded),
+              onPressed: () async {
+                setState(() {
+                  isLoaded = false;
+                });
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (ctx) =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+                searchResults = await NearbyPlaces(
+                        lat: widget.lat,
+                        lon: widget.lon,
+                        radius: searchRadius.toInt())
+                    .getMore(searchResults!.nextPageToken);
+                if (filterActive) {
+                  basicFilter(filters);
+                }
+                setState(() {
+                  isLoaded = true;
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: InkWell(
+            onTap: () => toggleMapCameraPos(
+                searchResults!.results[filterIndex].geometry.location.lat,
+                searchResults!.results[filterIndex].geometry.location.lng),
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(), color: Colors.green.withOpacity(0.5)),
+              width: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(searchResults!.results[filterIndex].name,
+                      textAlign: TextAlign.center),
+                  Text(
+                    "Type: ${StringExtension(string: searchResults!.results[filterIndex].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[filterIndex].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ),
+            ),
+          ));
+    }
   }
 }
