@@ -30,6 +30,11 @@ class MapWidget extends StatefulWidget {
   State<MapWidget> createState() => _MapWidgetState();
 }
 
+enum Filters {
+  None,
+  Restaurants,
+}
+
 class _MapWidgetState extends State<MapWidget> {
   static late GoogleMapController mapController;
 
@@ -41,9 +46,9 @@ class _MapWidgetState extends State<MapWidget> {
   NearbyLocationsData? searchResults;
   bool isLoaded = false;
 
-  List results =[];
+  List results = [];
 
-  String filterValue = '';
+  Filters? _filterValue;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -52,14 +57,6 @@ class _MapWidgetState extends State<MapWidget> {
     setState(() {
       isLoaded = true;
     });
-  }
-
-  filter(){
-    for (var i = 0; i < searchResults!.results.length; i++){
-      if (searchResults!.results[i].types.contains(filterValue)){
-        results.add(i);
-      }
-    }
   }
 
   setCircle() {
@@ -240,20 +237,23 @@ class _MapWidgetState extends State<MapWidget> {
             children: [
               CircleAvatar(
                 child: IconButton(
-                  onPressed: (){},
-                  icon:const Icon(Icons.filter_alt_outlined) 
-                  ),
+                    onPressed: () {
+                      showDialog(
+                          context: context, builder: (context) => filterPage());
+                    },
+                    icon: const Icon(Icons.filter_alt_outlined)),
               ),
               const SizedBox(width: 30),
               CircleAvatar(
                 child: IconButton(
-                  onPressed: (){},
+                  onPressed: () {},
                   icon: const Icon(Icons.star),
                 ),
               )
             ],
           ),
-        ),)
+        ),
+      )
     ]);
   }
 
@@ -271,7 +271,8 @@ class _MapWidgetState extends State<MapWidget> {
                     children: [
                       InkWell(
                         onTap: () => toggleMapCameraPos(
-                            searchResults!.results[results[index]].geometry.location.lat,
+                            searchResults!
+                                .results[results[index]].geometry.location.lat,
                             searchResults!
                                 .results[results[index]].geometry.location.lng),
                         child: Container(
@@ -305,7 +306,11 @@ class _MapWidgetState extends State<MapWidget> {
                             builder: (ctx) => const Center(
                                 child: CircularProgressIndicator()),
                           );
-                          searchResults = await NearbyPlaces(lat: widget.lat, lon: widget.lon, radius: searchRadius.toInt()).getMore(searchResults!.nextPageToken);
+                          searchResults = await NearbyPlaces(
+                                  lat: widget.lat,
+                                  lon: widget.lon,
+                                  radius: searchRadius.toInt())
+                              .getMore(searchResults!.nextPageToken);
                           setState(() {
                             isLoaded = true;
                           });
@@ -320,8 +325,10 @@ class _MapWidgetState extends State<MapWidget> {
                     padding: const EdgeInsets.all(5.0),
                     child: InkWell(
                       onTap: () => toggleMapCameraPos(
-                          searchResults!.results[results[index]].geometry.location.lat,
-                          searchResults!.results[results[index]].geometry.location.lng),
+                          searchResults!
+                              .results[results[index]].geometry.location.lat,
+                          searchResults!
+                              .results[results[index]].geometry.location.lng),
                       child: Container(
                         decoration: BoxDecoration(
                             border: Border.all(),
@@ -387,6 +394,48 @@ class _MapWidgetState extends State<MapWidget> {
     return AlertDialog(
       content: const Text('Enter Location Name'),
       actions: [name, saveButton],
+    );
+  }
+
+  filterPage() {
+    final title = Text('Filters');
+
+    final body = Center(
+      child: Column(
+        children: [
+          RadioListTile(
+            title: Text(Filters.None.name),
+            value: Filters.None,
+            groupValue: _filterValue,
+            onChanged: (value) {
+              setState(() {
+                _filterValue = value;
+                print(_filterValue);
+                navPop(context);
+              });
+            },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          RadioListTile(
+            title: Text(Filters.Restaurants.name),
+            value: Filters.Restaurants,
+            groupValue: _filterValue,
+            onChanged: (value) {
+              setState(() {
+                _filterValue = value;
+                navPop(context);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+
+    return AlertDialog(
+      title: title,
+      actions: [body],
     );
   }
 }
