@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously, constant_identifier_names
 
 import 'package:drop_n_go/models/favorite_locations.dart';
+import 'package:drop_n_go/services/functions.dart';
 import 'package:drop_n_go/services/nav.dart';
 import 'package:drop_n_go/services/nearby_places.dart';
 import 'package:drop_n_go/views/initializer.dart';
@@ -91,6 +92,9 @@ class _MapWidgetState extends State<MapWidget> {
 
   //current viewed result index
   late int currentIndex;
+
+  //sorted data list
+  late List<Map<String, dynamic>> sortedData;
 
   @override
   Widget build(BuildContext context) {
@@ -330,12 +334,12 @@ class _MapWidgetState extends State<MapWidget> {
             _markers.add(Marker(
                 markerId: const MarkerId('clickedResult'),
                 position: LatLng(
-                    searchResults!.results[filterIndex].geometry.location.lat,
+                    searchResults!.results[sortedData[filterIndex]["index"]].geometry.location.lat,
                     searchResults!
-                        .results[filterIndex].geometry.location.lng)));
+                        .results[sortedData[filterIndex]["index"]].geometry.location.lng)));
             toggleMapCameraPos(
-                searchResults!.results[filterIndex].geometry.location.lat,
-                searchResults!.results[filterIndex].geometry.location.lng);
+                searchResults!.results[sortedData[filterIndex]["index"]].geometry.location.lat,
+                searchResults!.results[sortedData[filterIndex]["index"]].geometry.location.lng);
             setState(() {
               resultClicked = true;
               currentIndex = filterIndex;
@@ -348,8 +352,8 @@ class _MapWidgetState extends State<MapWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('${listTileIndex + 1}', textAlign: TextAlign.center),
-                Text(searchResults!.results[filterIndex].name,
+                Text('${listTileIndex + 1}: ${sortedData[filterIndex]['distance'].toInt()}m',textAlign: TextAlign.center),
+                Text(searchResults!.results[sortedData[filterIndex]["index"]].name,
                     textAlign: TextAlign.center),
                 Text(
                   "Type: ${StringExtension(string: searchResults!.results[filterIndex].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[filterIndex].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
@@ -373,6 +377,7 @@ class _MapWidgetState extends State<MapWidget> {
     mapController = controller;
     setCircle();
     searchResults = widget.places;
+    sortedData = sort(searchResults, lat, lon);
     setState(() {
       isLoaded = true;
     });
@@ -436,6 +441,10 @@ class _MapWidgetState extends State<MapWidget> {
     searchResults = await NearbyPlaces(
             lat: widget.lat, lon: widget.lon, radius: searchRadius.toInt())
         .get();
+
+          setState(() {
+            sortedData = sort(searchResults, lat, lon);
+          });
     if (filterActive) {
       setState(() {
         basicFilter(filters);
