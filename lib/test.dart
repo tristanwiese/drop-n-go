@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 import 'models/nearby_locations_data.dart';
 
@@ -10,3 +9,6 @@ class TestData{
 
   
 }
+
+const double myLat = -33.646636;
+const  double myLon = 19.0063848;

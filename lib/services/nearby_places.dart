@@ -22,6 +22,7 @@ class NearbyPlaces {
     var response = await http.get(Uri.parse(url), headers: corsHeaders);
     if (response.statusCode == 200) {
       String json = response.body;
+      print("Radius = $url");
       return nearbyLocationsDataFromJson(json);
     } else {
       return null;
