@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously, constant_identifier_names
 
 import 'package:drop_n_go/models/favorite_locations.dart';
+import 'package:drop_n_go/models/sorted_results.dart';
 import 'package:drop_n_go/services/functions.dart';
 import 'package:drop_n_go/services/nav.dart';
 import 'package:drop_n_go/services/nearby_places.dart';
@@ -94,7 +95,7 @@ class _MapWidgetState extends State<MapWidget> {
   late int currentIndex;
 
   //sorted data list
-  late List<Map<String, dynamic>> sortedData;
+  late List<Result> sortedData;
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +235,7 @@ class _MapWidgetState extends State<MapWidget> {
                 resultClicked
                     ? Expanded(
                         child: ElevatedButton(
-                          onPressed: () async{
+                          onPressed: () async {
                             String mapUrl =
                                 "https://www.google.com/maps/@${searchResults!.results[currentIndex].geometry.location.lat},${searchResults!.results[currentIndex].geometry.location.lng},19z";
                             final mapUri = Uri.parse(mapUrl);
@@ -248,7 +249,7 @@ class _MapWidgetState extends State<MapWidget> {
                 isLoaded
                     ? searchResults!.nextPageToken != null
                         ? ElevatedButton(
-                            onPressed: () => getMoreData(),
+                            onPressed: () => null,//getMoreData(),
                             child: const Text('Load more'))
                         : Container()
                     : Container()
@@ -319,9 +320,9 @@ class _MapWidgetState extends State<MapWidget> {
                 : const Center(child: Text("No results found"))
             : ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: searchResults!.results.length,
+                itemCount: sortedData.length,
                 itemBuilder: (BuildContext context, index) {
-                  return myListBuilder(index, index, searchResults!.results);
+                  return myListBuilder(index, index, sortedData);
                 })
         : Container();
   }
@@ -333,13 +334,10 @@ class _MapWidgetState extends State<MapWidget> {
           onTap: () {
             _markers.add(Marker(
                 markerId: const MarkerId('clickedResult'),
-                position: LatLng(
-                    searchResults!.results[sortedData[filterIndex]["index"]].geometry.location.lat,
-                    searchResults!
-                        .results[sortedData[filterIndex]["index"]].geometry.location.lng)));
-            toggleMapCameraPos(
-                searchResults!.results[sortedData[filterIndex]["index"]].geometry.location.lat,
-                searchResults!.results[sortedData[filterIndex]["index"]].geometry.location.lng);
+                position: LatLng(sortedData[filterIndex].geometry.location.lat,
+                    sortedData[filterIndex].geometry.location.lng)));
+            toggleMapCameraPos(sortedData[filterIndex].geometry.location.lat,
+                sortedData[filterIndex].geometry.location.lng);
             setState(() {
               resultClicked = true;
               currentIndex = filterIndex;
@@ -352,9 +350,8 @@ class _MapWidgetState extends State<MapWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('${listTileIndex + 1}: ${sortedData[filterIndex]['distance'].toInt()}m',textAlign: TextAlign.center),
-                Text(searchResults!.results[sortedData[filterIndex]["index"]].name,
-                    textAlign: TextAlign.center),
+                Text('${listTileIndex + 1}: ${distanceBetween(widget.lat, widget.lon, sortedData[filterIndex].geometry.location.lat, sortedData[filterIndex].geometry.location.lng).toInt()}m', textAlign: TextAlign.center),
+                Text(sortedData[filterIndex].name, textAlign: TextAlign.center),
                 Text(
                   "Type: ${StringExtension(string: searchResults!.results[filterIndex].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[filterIndex].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
                   textAlign: TextAlign.center,
@@ -365,15 +362,13 @@ class _MapWidgetState extends State<MapWidget> {
         ));
   }
 
-
-
-
-  _launchUrl(url)async{
+  _launchUrl(url) async {
     if (!await launchUrl(url)) {
-    throw Exception('Could not launch $url');
+      throw Exception('Could not launch $url');
     }
   }
-   void _onMapCreated(GoogleMapController controller) {
+
+  void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     setCircle();
     searchResults = widget.places;
@@ -419,8 +414,8 @@ class _MapWidgetState extends State<MapWidget> {
   basicFilter(List<String?> filters) {
     List index = [];
     for (var j = 0; j < filters.length; j++) {
-      for (var i = 0; i < searchResults!.results.length; i++) {
-        if (searchResults!.results[i].types.contains(filters[j])) {
+      for (var i = 0; i < sortedData.length; i++) {
+        if (sortedData[i].types.contains(filters[j])) {
           if (!index.contains(i)) {
             index.add(i);
           }
@@ -441,10 +436,10 @@ class _MapWidgetState extends State<MapWidget> {
     searchResults = await NearbyPlaces(
             lat: widget.lat, lon: widget.lon, radius: searchRadius.toInt())
         .get();
-
-          setState(() {
-            sortedData = sort(searchResults, lat, lon);
-          });
+    print(searchResults!.nextPageToken);
+    setState(() {
+      sortedData = sort(searchResults, lat, lon);
+    });
     if (filterActive) {
       setState(() {
         basicFilter(filters);
@@ -467,6 +462,9 @@ class _MapWidgetState extends State<MapWidget> {
         .getMore(searchResults!.nextPageToken);
     searchResults!.results.addAll(moreResults!.results);
     searchResults!.nextPageToken = moreResults.nextPageToken;
+    setState(() {
+      sortedData = sort(searchResults, lat, lon);
+    });
     if (filterActive) {
       basicFilter(filters);
     }

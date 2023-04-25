@@ -1,39 +1,28 @@
+
+
 import 'dart:convert';
 
-NearbyLocationsData nearbyLocationsDataFromJson(String str) => NearbyLocationsData.fromJson(json.decode(str));
+SortedListResults sortedListResultsFromJson(String str) => SortedListResults.fromJson(json.decode(str));
 
-String nearbyLocationsDataToJson(NearbyLocationsData data) => json.encode(data.toJson());
+String sortedListResultsToJson(SortedListResults data) => json.encode(data.toJson());
 
-class NearbyLocationsData {
-    NearbyLocationsData({
-        required this.htmlAttributions,
-        required this.nextPageToken,
-        required this.results,
-        required this.status,
-    });
+class SortedListResults{
+  SortedListResults({
+    required this.results
+  });
+  final List<SortedResult> results;
 
-    List<dynamic>? htmlAttributions;
-    String? nextPageToken;
-    List<Result> results;
-    String status;
-
-    factory NearbyLocationsData.fromJson(Map<String, dynamic> json) => NearbyLocationsData(
-        htmlAttributions: List<dynamic>.from(json["html_attributions"].map((x) => x)),
-        nextPageToken: json["next_page_token"],
-        results: List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
-        status: json["status"],
+  factory SortedListResults.fromJson(Map<String, dynamic> json) => SortedListResults(
+        results: List<SortedResult>.from(json["results"].map((x) => SortedResult.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
-        "html_attributions": List<dynamic>.from(htmlAttributions!.map((x) => x)),
-        "next_page_token": nextPageToken,
         "results": List<dynamic>.from(results.map((x) => x.toJson())),
-        "status": status,
-    };
+};
 }
 
-class Result {
-    Result({
+class SortedResult {
+    SortedResult({
         required this.geometry,
         required this.icon,
         required this.iconBackgroundColor,
@@ -71,7 +60,7 @@ class Result {
     OpeningHours? openingHours;
     int? priceLevel;
 
-    factory Result.fromJson(Map<String, dynamic> json) => Result(
+    factory SortedResult.fromJson(Map<String, dynamic> json) => SortedResult(
         geometry: Geometry.fromJson(json["geometry"]),
         icon: json["icon"],
         iconBackgroundColor: json["icon_background_color"],
@@ -111,7 +100,6 @@ class Result {
         "price_level": priceLevel,
     };
 }
-
 enum BusinessStatus { OPERATIONAL }
 
 final businessStatusValues = EnumValues({

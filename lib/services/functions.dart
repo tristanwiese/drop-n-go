@@ -1,5 +1,8 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:math';
+
+import 'package:drop_n_go/models/sorted_results.dart';
 
 import '../models/nearby_locations_data.dart';
 
@@ -22,12 +25,15 @@ double distanceBetween(double lat1, double lon1, double lat2, double lon2) {
   return distance * 1000;
 }
 
-List<Map<String, dynamic>> sort(NearbyLocationsData? data, lat, lon) {
+
+List<Result> sort(NearbyLocationsData? data, lat, lon) {
   List<Result> results = data!.results;
 
   List<Map<String, dynamic>> sortedData = [];
   Map sortedMap = {};
   Map<double, int> map = {};
+  List<Result> sortedResults = [];
+
   for (var i = 0; i < results.length; i++) {
     double distance = distanceBetween(lat, lon,
         results[i].geometry.location.lat, results[i].geometry.location.lng);
@@ -37,6 +43,7 @@ List<Map<String, dynamic>> sort(NearbyLocationsData? data, lat, lon) {
   }
   sortedMap.forEach((key, value) {
     sortedData.add({"distance": key, "index": value});
+    sortedResults.add(data.results[value]);
   });
-  return sortedData;
+  return sortedResults;
 }

@@ -11,6 +11,7 @@ class NearbyPlaces {
   NearbyPlaces({required this.lat, required this.lon, required this.radius});
 
   Future<NearbyLocationsData?> get() async {
+    NearbyLocationsData results;
     final corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
@@ -22,8 +23,26 @@ class NearbyPlaces {
     var response = await http.get(Uri.parse(url), headers: corsHeaders);
     if (response.statusCode == 200) {
       String json = response.body;
-      print("Radius = $url");
-      return nearbyLocationsDataFromJson(json);
+      //print("Radius = $url");
+      results = nearbyLocationsDataFromJson(json);
+      while (results.nextPageToken != null){
+        //print('fired');
+        final token = results.nextPageToken;
+        String url =
+        "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&pagetoken=$token&key=AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4";
+        var response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          String json = response.body;
+          final extra = nearbyLocationsDataFromJson(json);
+          results.nextPageToken = extra.nextPageToken; 
+          results.results.addAll(extra.results);
+        } else {
+          print(response.statusCode);
+          return null;
+        }
+      }
+      //print('ended');
+      return results;
     } else {
       return null;
     }
