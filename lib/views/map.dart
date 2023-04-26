@@ -1,7 +1,6 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously, constant_identifier_names
+// ignore_for_file: avoid_print, use_build_context_synchronously, constant_identifier_names, prefer_final_fields, no_logic_in_create_state
 
 import 'package:drop_n_go/models/favorite_locations.dart';
-import 'package:drop_n_go/models/sorted_results.dart';
 import 'package:drop_n_go/services/functions.dart';
 import 'package:drop_n_go/services/nav.dart';
 import 'package:drop_n_go/services/nearby_places.dart';
@@ -14,7 +13,6 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:drop_n_go/services/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import '../models/nearby_locations_data.dart';
 
 class MapWidget extends StatefulWidget {
@@ -249,7 +247,7 @@ class _MapWidgetState extends State<MapWidget> {
                 isLoaded
                     ? searchResults!.nextPageToken != null
                         ? ElevatedButton(
-                            onPressed: () => null,//getMoreData(),
+                            onPressed: () => getMoreData(),
                             child: const Text('Load more'))
                         : Container()
                     : Container()
@@ -350,7 +348,9 @@ class _MapWidgetState extends State<MapWidget> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('${listTileIndex + 1}: ${distanceBetween(widget.lat, widget.lon, sortedData[filterIndex].geometry.location.lat, sortedData[filterIndex].geometry.location.lng).toInt()}m', textAlign: TextAlign.center),
+                Text(
+                    '${listTileIndex + 1}: ${distanceBetween(widget.lat, widget.lon, sortedData[filterIndex].geometry.location.lat, sortedData[filterIndex].geometry.location.lng).toInt()}m',
+                    textAlign: TextAlign.center),
                 Text(sortedData[filterIndex].name, textAlign: TextAlign.center),
                 Text(
                   "Type: ${StringExtension(string: searchResults!.results[filterIndex].types[0].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}, ${StringExtension(string: searchResults!.results[filterIndex].types[1].replaceAll(RegExp('[\\W_]+'), ' ')).capitalize()}",
@@ -436,7 +436,6 @@ class _MapWidgetState extends State<MapWidget> {
     searchResults = await NearbyPlaces(
             lat: widget.lat, lon: widget.lon, radius: searchRadius.toInt())
         .get();
-    print(searchResults!.nextPageToken);
     setState(() {
       sortedData = sort(searchResults, lat, lon);
     });
@@ -462,9 +461,8 @@ class _MapWidgetState extends State<MapWidget> {
         .getMore(searchResults!.nextPageToken);
     searchResults!.results.addAll(moreResults!.results);
     searchResults!.nextPageToken = moreResults.nextPageToken;
-    setState(() {
-      sortedData = sort(searchResults, lat, lon);
-    });
+    final moreResultsSorted = sort(moreResults, lat, lon);
+    sortedData.addAll(moreResultsSorted);
     if (filterActive) {
       basicFilter(filters);
     }
