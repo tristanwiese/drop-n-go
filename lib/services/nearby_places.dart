@@ -7,22 +7,27 @@ class NearbyPlaces {
   int radius;
   double lat;
   double lon;
+  final String _key = 'AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4';
 
   NearbyPlaces({required this.lat, required this.lon, required this.radius});
 
   Future<NearbyLocationsData?> get() async {
-    final corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-    };
 
     String url =
-        "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=$lat,$lon&radius=$radius&key=AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4";
-
-    var response = await http.get(Uri.parse(url), headers: corsHeaders);
+        "http://localhost/google_nearby_places_api/get.places.php";
+    var response = await http.post(
+      Uri.parse(url),
+      body: {
+        'get': 'normal',
+        'lat':'$lat',
+        'lon':'$lon',
+        'rad':'$radius',
+        'key': _key,
+      }
+      );
     if (response.statusCode == 200) {
       String json = response.body;
-      print("Radius = $url");
+
       return nearbyLocationsDataFromJson(json);
     } else {
       return null;
@@ -31,12 +36,18 @@ class NearbyPlaces {
 
   Future<NearbyLocationsData?> getMore(token) async {
     String url =
-        "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&pagetoken=$token&key=AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4";
+        "http://localhost/google_nearby_places_api/get.places.php";
 
-    var response = await http.get(Uri.parse(url));
+    var response = await http.post(
+      Uri.parse(url),
+      body:{
+        'get': 'more',
+        'token':'$token',
+        'key':_key
+      }
+      );
     if (response.statusCode == 200) {
       String json = response.body;
-      print("Radius = $url");
       return nearbyLocationsDataFromJson(json);
     } else {
       return null;
