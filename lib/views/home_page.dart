@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-           const Logo(),
+          //  const Logo(),
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.green[100],

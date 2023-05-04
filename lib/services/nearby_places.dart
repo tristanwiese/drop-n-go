@@ -14,7 +14,7 @@ class NearbyPlaces {
   Future<NearbyLocationsData?> get() async {
 
     String url =
-        "http://localhost/google_nearby_places_api/get.places.php";
+        "https://etrainer.co.za/tristan/google_nearby_places_api/get.places.php";
     var response = await http.post(
       Uri.parse(url),
       body: {
@@ -36,7 +36,7 @@ class NearbyPlaces {
 
   Future<NearbyLocationsData?> getMore(token) async {
     String url =
-        "http://localhost/google_nearby_places_api/get.places.php";
+        "https://etrainer.co.za/tristan/google_nearby_places_api/get.places.php";
 
     var response = await http.post(
       Uri.parse(url),
