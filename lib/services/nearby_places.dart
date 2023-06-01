@@ -7,7 +7,7 @@ class NearbyPlaces {
   int radius;
   double lat;
   double lon;
-  final String _key = 'AIzaSyASHyqPfVoEeH4KDaCKbz4Vr6ZM1vzdSO4';
+  final String _key = '';
 
   NearbyPlaces({required this.lat, required this.lon, required this.radius});
 
