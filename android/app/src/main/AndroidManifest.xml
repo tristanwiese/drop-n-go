@@ -2,7 +2,7 @@
 
     package="com.example.drop_n_go">
    <application
-        android:label="drop_n_go"
+        android:label="Drop N Go"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"

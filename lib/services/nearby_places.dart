@@ -7,26 +7,24 @@ class NearbyPlaces {
   int radius;
   double lat;
   double lon;
-  final String _key = '';
+  final String _key = 'AIzaSyAlDA6e_tymSuGdvSX7aLNth2mdkEzFPQA';
 
   NearbyPlaces({required this.lat, required this.lon, required this.radius});
 
   Future<NearbyLocationsData?> get() async {
-
     String url =
         "https://etrainer.co.za/tristan/google_nearby_places_api/get.places.php";
-    var response = await http.post(
-      Uri.parse(url),
-      body: {
-        'get': 'normal',
-        'lat':'$lat',
-        'lon':'$lon',
-        'rad':'$radius',
-        'key': _key,
-      }
-      );
+    var response = await http.post(Uri.parse(url), body: {
+      'get': 'normal',
+      'lat': '$lat',
+      'lon': '$lon',
+      'rad': '$radius',
+      'key': _key,
+    });
     if (response.statusCode == 200) {
       String json = response.body;
+
+      print(response.body);
 
       return nearbyLocationsDataFromJson(json);
     } else {
@@ -38,14 +36,8 @@ class NearbyPlaces {
     String url =
         "https://etrainer.co.za/tristan/google_nearby_places_api/get.places.php";
 
-    var response = await http.post(
-      Uri.parse(url),
-      body:{
-        'get': 'more',
-        'token':'$token',
-        'key':_key
-      }
-      );
+    var response = await http.post(Uri.parse(url),
+        body: {'get': 'more', 'token': '$token', 'key': _key});
     if (response.statusCode == 200) {
       String json = response.body;
       return nearbyLocationsDataFromJson(json);

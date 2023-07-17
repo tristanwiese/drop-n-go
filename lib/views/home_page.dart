@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          //  const Logo(),
+            //  const Logo(),
             CircleAvatar(
               radius: 40,
               backgroundColor: Colors.green[100],
@@ -89,7 +89,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           lat: widget.currentPosition!.latitude,
                           radius: 1000)
                       .get();
-                      navPop(context);
+                  print(places!.results.length);
+                  navPop(context);
                   navPush(
                     context,
                     MapWidget(

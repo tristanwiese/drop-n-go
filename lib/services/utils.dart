@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Utils {
+  // static dynamic user = FirebaseFirestore.instance.collection('users').doc(uid);
 
- // static dynamic user = FirebaseFirestore.instance.collection('users').doc(uid);
-  
   static Color? loginButtonColor = Colors.green;
   static Color? registerButtonColor = Colors.green;
 
@@ -41,15 +40,20 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-    Text('Drop n Go', style: TextStyle(fontSize: 70)),
-    Icon(Icons.location_on_outlined, size: 60, color: Colors.green,),
-          ],
-        );
+      children: [
+        Text('Drop n Go', style: TextStyle(fontSize: 50)),
+        Icon(
+          Icons.location_on_outlined,
+          size: 60,
+          color: Colors.green,
+        ),
+      ],
+    );
   }
 }
+
 class AppBarLogo extends StatelessWidget {
   const AppBarLogo({
     super.key,
@@ -57,31 +61,33 @@ class AppBarLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-    Text('Drop n Go', style: TextStyle(fontSize: 50)),
-    Icon(Icons.location_on_outlined, size: 60, color: Colors.white,),
-          ],
-        );
+      children: [
+        Text('Drop n Go', style: TextStyle(fontSize: 50)),
+        Icon(
+          Icons.location_on_outlined,
+          size: 60,
+          color: Colors.white,
+        ),
+      ],
+    );
   }
 }
 
-class StringExtension{
-  StringExtension({
-    required this.string
-  });
+class StringExtension {
+  StringExtension({required this.string});
 
   String string;
-    String capitalize() {
-      var result = string[0].toUpperCase();
-  for (int i = 1; i < string.length; i++) {
-    if (string[i - 1] == " ") {
-      result = result + string[i].toUpperCase();
-    } else {
-      result = result + string[i];
+  String capitalize() {
+    var result = string[0].toUpperCase();
+    for (int i = 1; i < string.length; i++) {
+      if (string[i - 1] == " ") {
+        result = result + string[i].toUpperCase();
+      } else {
+        result = result + string[i];
+      }
     }
+    return result;
   }
-  return result;
 }
-    }

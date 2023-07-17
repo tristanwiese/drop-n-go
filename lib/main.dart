@@ -32,8 +32,19 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Drop n Go',
       theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
+          primarySwatch: Colors.green,
+          colorScheme: ColorScheme(
+              brightness: Brightness.dark,
+              primary: Color.fromARGB(255, 152, 202, 163),
+              onPrimary: Colors.black,
+              secondary: Colors.green,
+              onSecondary: Colors.black,
+              error: Colors.red,
+              onError: Colors.black,
+              background: Colors.white,
+              onBackground: Colors.black,
+              surface: Colors.white,
+              onSurface: Colors.black)),
       home: const MainPage(),
     );
   }
@@ -41,7 +52,6 @@ class MyApp extends StatelessWidget {
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
-
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -53,6 +63,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         body: StreamBuilder<User?>(

@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'dart:async';
 import 'package:drop_n_go/services/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import '../models/nearby_locations_data.dart';
 
 class MapWidget extends StatefulWidget {
@@ -59,7 +58,7 @@ class _MapWidgetState extends State<MapWidget> {
   double searchRadius = 1000;
 
   //map markers
-  late Set<Marker> _markers = {
+  late final Set<Marker> _markers = {
     Marker(
         markerId: const MarkerId('currentPosition'),
         position: LatLng(lat, lon),
@@ -230,7 +229,7 @@ class _MapWidgetState extends State<MapWidget> {
                 resultClicked
                     ? Expanded(
                         child: ElevatedButton(
-                          onPressed: () async{
+                          onPressed: () async {
                             String mapUrl =
                                 "https://www.google.com/maps/@${searchResults!.results[currentIndex].geometry.location.lat},${searchResults!.results[currentIndex].geometry.location.lng},19z";
                             final mapUri = Uri.parse(mapUrl);
@@ -254,7 +253,7 @@ class _MapWidgetState extends State<MapWidget> {
       Positioned(
         bottom: 80,
         child: SizedBox(
-          height: 150,
+          height: 130,
           width: MediaQuery.of(context).size.width,
           child: nearbyPlacesDrawer(),
         ),
@@ -303,6 +302,7 @@ class _MapWidgetState extends State<MapWidget> {
   }
 
   nearbyPlacesDrawer() {
+    print(isLoaded);
     return isLoaded
         ? filterActive
             ? indexes!.isNotEmpty
@@ -343,12 +343,14 @@ class _MapWidgetState extends State<MapWidget> {
           },
           child: Container(
             decoration: BoxDecoration(
-                border: Border.all(), color: Colors.green.withOpacity(0.5)),
+                border: Border.all(),
+                color:
+                    const Color.fromARGB(255, 149, 214, 151).withOpacity(0.5),
+                borderRadius: BorderRadius.circular(10)),
             width: 150,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('${listTileIndex + 1}', textAlign: TextAlign.center),
                 Text(searchResults!.results[filterIndex].name,
                     textAlign: TextAlign.center),
                 Text(
@@ -361,15 +363,13 @@ class _MapWidgetState extends State<MapWidget> {
         ));
   }
 
-
-
-
-  _launchUrl(url)async{
+  _launchUrl(url) async {
     if (!await launchUrl(url)) {
-    throw Exception('Could not launch $url');
+      throw Exception('Could not launch $url');
     }
   }
-   void _onMapCreated(GoogleMapController controller) {
+
+  void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     setCircle();
     searchResults = widget.places;
